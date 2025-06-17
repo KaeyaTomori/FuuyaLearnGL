@@ -118,8 +118,7 @@ void initShader()
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
-int main()
-{
+int render() {
     auto window = initWindow();
     if (window == nullptr)
     {
@@ -171,10 +170,13 @@ int main()
     }
     stbi_image_free(data);
 
+    
+    
     glUniform1i(glGetUniformLocation(myShader->shaderProgram, "texture1"), 0); // 手动设置
     myShader->setInt("texture2", 1); // 或者使用着色器类设置
     //  线框模式绘制
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    
     // main loop
     while(!glfwWindowShouldClose(window))
     {
@@ -184,6 +186,11 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        unsigned int transformLoc = glGetUniformLocation(myShader->shaderProgram, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
         draw();
         
         // 接受事件 交换缓冲区
@@ -192,6 +199,11 @@ int main()
     }
 
     glfwTerminate();
+}
+
+int main()
+{
+    render();
     
     return 0;
 }
