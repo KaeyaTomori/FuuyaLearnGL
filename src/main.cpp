@@ -28,48 +28,50 @@ void processInput(GLFWwindow *window);
 //    -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f    // 左上
 // };
 
+const int stride = 6;
+
 float vertices[] = {
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+     0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    -0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
+    -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f, 
 
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f,  0.0f, 1.0f,
 
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
 
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
 
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+    -0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
 
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+     0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    -0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+    -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 };
 
 glm::vec3 cubePositions[] = {
@@ -100,6 +102,12 @@ unsigned int indices[] = {
     1, 2, 3  // 第二个三角形
 };
 
+float screenWidth = 800.f;
+float screenHeight = 600.f;
+float cameraSpeed = 0.001f; // adjust accordingly
+float deltaTime = 0.0f; // 当前帧与上一帧的时间差
+float lastFrame = 0.0f; // 上一帧的时间
+
 glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
 glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
 glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
@@ -109,13 +117,13 @@ glm::mat4 projection = glm::mat4(1.0f);
 
 Camera camera = Camera();
 shared_ptr<Shader> myShader;
+shared_ptr<Shader> lightShader;
 unsigned int VAO;
+unsigned int VBO;
 unsigned int EBO;
-float screenWidth = 800.f;
-float screenHeight = 600.f;
-float cameraSpeed = 0.001f; // adjust accordingly
-float deltaTime = 0.0f; // 当前帧与上一帧的时间差
-float lastFrame = 0.0f; // 上一帧的时间
+unsigned int lightVAO;
+
+glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 void draw()
 {
@@ -161,6 +169,20 @@ GLFWwindow* initWindow()
     return window;
 }
 
+void initLight()
+{
+    lightShader = make_shared<Shader>("./Shaders/shader.vs", "./Shaders/light.frag");
+    lightShader->use();
+
+    glGenVertexArrays(1, &lightVAO);
+    glBindVertexArray(lightVAO);
+    // 只需要绑定VBO不用再次设置VBO的数据，因为箱子的VBO数据中已经包含了正确的立方体顶点数据
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    // 设置灯立方体的顶点属性（对我们的灯来说仅仅只有位置数据）
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+}
+
 void initShader()
 {
     myShader = make_shared<Shader>("Shaders/shader.vs", "Shaders/shader.fs");
@@ -168,7 +190,6 @@ void initShader()
 
     // ..:: 初始化代码（只运行一次 (除非你的物体频繁改变)） :: ..
     glGenVertexArrays(1, &VAO);
-    unsigned int VBO;
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
 
@@ -181,14 +202,17 @@ void initShader()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
     // 3. 设置顶点属性指针
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)0);
-    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (void*)(3 * sizeof(float)));
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride * sizeof(float), (void*)(3 * sizeof(float)));
     // glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
     glEnableVertexAttribArray(0);
     glEnableVertexAttribArray(1);
     // glEnableVertexAttribArray(2);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    myShader->setVec3("objectColor", glm::vec3(1.0f, 0.5f, 0.31f));
+    myShader->setVec3("lightColor", glm::vec3(1.0f, 1.0f, 1.0f));
+    myShader->setVec3("lightPos", lightPos);
 }
 
 void loadTexture(unsigned int &texture, string path, bool rgba)
@@ -223,33 +247,21 @@ int render() {
     }
 
     initShader();
+    initLight();
 
-    stbi_set_flip_vertically_on_load(true); // gl y轴反向，加载图片时反转y轴
-    unsigned int texture;
-    glActiveTexture(GL_TEXTURE0);
-    loadTexture(texture, "pic/container.jpg", false);
-
-    unsigned int texture1;
-    glActiveTexture(GL_TEXTURE1);
-    loadTexture(texture1, "pic/awesomeface.png", true);
-
-    myShader->setInt("texture1", 0);
-    myShader->setInt("texture2", 1);
-    
-    model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-
-    // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f); // z轴指向屏幕外
-    // glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    // glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget); // 目标指向摄像机
-    // glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); 
-    // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-    // glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+    // stbi_set_flip_vertically_on_load(true); // gl y轴反向，加载图片时反转y轴
+    // unsigned int texture;
+    // glActiveTexture(GL_TEXTURE0);
+    // loadTexture(texture, "pic/container.jpg", false);
+    //
+    // unsigned int texture1;
+    // glActiveTexture(GL_TEXTURE1);
+    // loadTexture(texture1, "pic/awesomeface.png", true);
+    //
+    // myShader->setInt("texture1", 0);
+    // myShader->setInt("texture2", 1);
     
     projection = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
-    
-    myShader->setMat4("model", model);
-    myShader->setMat4("view", view);
-    myShader->setMat4("projection", projection);
     
     //  线框模式绘制
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -273,20 +285,25 @@ int render() {
         glClear(GL_COLOR_BUFFER_BIT);
 
         view = camera.GetViewMatrix();        
+
+        myShader->use();
+        glBindVertexArray(VAO);
+        glm::mat4 model = glm::mat4(1.0f);
+        myShader->setMat4("model", model);
         myShader->setMat4("view", view);
         myShader->setMat4("projection", projection);
+        myShader->setVec3("viewPos", camera.Position);
+        draw();
 
-        glBindVertexArray(VAO);
-        for(unsigned int i = 0; i < 10; i++)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, cubePositions[i]);
-            float angle = 20.0f * i; 
-            model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
-            myShader->setMat4("model", model);
-
-            glDrawArrays(GL_TRIANGLES, 0, 36);
-        }
+        lightShader->use();
+        glBindVertexArray(lightVAO);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, lightPos);
+        model = glm::scale(model, glm::vec3(0.2f));
+        lightShader->setMat4("model", model);
+        lightShader->setMat4("view", view);
+        lightShader->setMat4("projection", projection);
+        draw();
         
         // 接受事件 交换缓冲区
         glfwPollEvents();
@@ -330,6 +347,14 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
         camera.ProcessKeyboard(RIGHT, deltaTime);
+    }
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+    {
+        camera.ProcessKeyboard(UP, deltaTime);
+    }
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+    {
+        camera.ProcessKeyboard(DOWN, deltaTime);
     }
 }
 
