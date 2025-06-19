@@ -11,18 +11,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
+#include "Camera.h"
+
 using namespace std;
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void processInput(GLFWwindow *window);
-
-shared_ptr<Shader> myShader;
-unsigned int VAO;
-unsigned int EBO;
-float screenWidth = 800.f;
-float screenHeight = 600.f;
 
 // float vertices[] = {
 //     //     ---- 位置 ----       ---- 颜色 ----     - 纹理坐标 -
@@ -89,16 +85,6 @@ glm::vec3 cubePositions[] = {
     glm::vec3(-1.3f,  1.0f, -1.5f)  
   };
 
-float cameraSpeed = 0.001f; // adjust accordingly
-float deltaTime = 0.0f; // 当前帧与上一帧的时间差
-float lastFrame = 0.0f; // 上一帧的时间
-
-glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
-glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
-glm::mat4 projection = glm::mat4(1.0f);
-
-
 float texCoords[] = {
     0.0f, 0.0f, // 左下角
     1.0f, 0.0f, // 右下角
@@ -114,13 +100,25 @@ unsigned int indices[] = {
     1, 2, 3  // 第二个三角形
 };
 
+glm::vec3 cameraPos   = glm::vec3(0.0f, 0.0f,  3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
+glm::vec3 cameraUp    = glm::vec3(0.0f, 1.0f,  0.0f);
+glm::mat4 model = glm::mat4(1.0f);
+glm::mat4 view = glm::mat4(1.0f);
+glm::mat4 projection = glm::mat4(1.0f);
+
+Camera camera = Camera();
+shared_ptr<Shader> myShader;
+unsigned int VAO;
+unsigned int EBO;
+float screenWidth = 800.f;
+float screenHeight = 600.f;
+float cameraSpeed = 0.001f; // adjust accordingly
+float deltaTime = 0.0f; // 当前帧与上一帧的时间差
+float lastFrame = 0.0f; // 上一帧的时间
 
 void draw()
 {
-    // float timeValue = glfwGetTime();
-    // float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
-    // int vertexColorLocation = glGetUniformLocation(shaderProgram, "color");
-    // glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
     // ..:: 绘制代码（渲染循环中） :: ..
     // 4. 绘制物体
     glDrawArrays(GL_TRIANGLES, 0, 36);
@@ -193,6 +191,30 @@ void initShader()
     // glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
+void loadTexture(unsigned int &texture, string path, bool rgba)
+{
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    // 为当前绑定的纹理对象设置环绕、过滤方式
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    // 加载并生成纹理
+    int width, height, nrChannels;
+    unsigned char *data = stbi_load(path.c_str(), &width, &height, &nrChannels, 0);
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, rgba ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load texture" << std::endl;
+    }
+    stbi_image_free(data);
+}
+
 int render() {
     auto window = initWindow();
     if (window == nullptr)
@@ -202,50 +224,18 @@ int render() {
 
     initShader();
 
-    stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(true); // gl y轴反向，加载图片时反转y轴
     unsigned int texture;
-    glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
-    // 为当前绑定的纹理对象设置环绕、过滤方式
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);   
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // 加载并生成纹理
-    int width, height, nrChannels;
-    unsigned char *data = stbi_load("pic/container.jpg", &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture" << std::endl;
-    }
-    stbi_image_free(data);
+    glActiveTexture(GL_TEXTURE0);
+    loadTexture(texture, "pic/container.jpg", false);
 
     unsigned int texture1;
-    glGenTextures(1, &texture1);
     glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_2D, texture1);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);   
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    data = stbi_load("pic/awesomeface.png", &width, &height, &nrChannels, 0);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load texture1" << std::endl;
-    }
-    stbi_image_free(data);
+    loadTexture(texture1, "pic/awesomeface.png", true);
 
-    glm::mat4 model = glm::mat4(1.0f);
+    myShader->setInt("texture1", 0);
+    myShader->setInt("texture2", 1);
+    
     model = glm::rotate(model, glm::radians(-55.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 
     // glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f); // z轴指向屏幕外
@@ -254,23 +244,16 @@ int render() {
     // glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f); 
     // glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
     // glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
-
-    glm::mat4 view = glm::mat4(1.0f);
-    // view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-    // view = glm::lookAt(cameraPos, cameraTarget, cameraUp);
     
     projection = glm::perspective(glm::radians(45.0f), screenWidth / screenHeight, 0.1f, 100.0f);
-    unsigned int Loc = glGetUniformLocation(myShader->shaderProgram, "model");
-    glUniformMatrix4fv(Loc, 1, GL_FALSE, glm::value_ptr(model));
-    Loc = glGetUniformLocation(myShader->shaderProgram, "view");
-    glUniformMatrix4fv(Loc, 1, GL_FALSE, glm::value_ptr(view));
-    Loc = glGetUniformLocation(myShader->shaderProgram, "projection");
-    glUniformMatrix4fv(Loc, 1, GL_FALSE, glm::value_ptr(projection));
     
-    glUniform1i(glGetUniformLocation(myShader->shaderProgram, "texture1"), 0); // 手动设置
-    myShader->setInt("texture2", 1); // 或者使用着色器类设置
+    myShader->setMat4("model", model);
+    myShader->setMat4("view", view);
+    myShader->setMat4("projection", projection);
+    
     //  线框模式绘制
     // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    
     glEnable(GL_DEPTH_TEST); // 启用深度测试
     
     
@@ -289,26 +272,7 @@ int render() {
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // glm::mat4 trans = glm::mat4(1.0f);
-        // trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-        // trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        // unsigned int transformLoc = glGetUniformLocation(myShader->shaderProgram, "transform");
-        // glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-        // model= glm::mat4(1.0f);
-        // model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
-        // Loc = glGetUniformLocation(myShader->shaderProgram, "model");
-        // glUniformMatrix4fv(Loc, 1, GL_FALSE, glm::value_ptr(model));
-        // draw();
-
-        // float radius = 10.0f;
-        // float camX = sin(glfwGetTime()) * radius;
-        // float camZ = cos(glfwGetTime()) * radius;
-        // glm::mat4 view = glm::mat4(1.0f);
-        // // view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
-        // // view = glm::lookAt(cameraPos, cameraTarget, up);
-        // view = glm::lookAt(glm::vec3(camX, 0.0, camZ), glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 1.0, 0.0));
-        view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-        
+        view = camera.GetViewMatrix();        
         myShader->setMat4("view", view);
         myShader->setMat4("projection", projection);
 
@@ -347,26 +311,25 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 
 void processInput(GLFWwindow *window)
 {
-    float cameraSpeed = 2.5f * deltaTime;
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
         glfwSetWindowShouldClose(window, true);
     }
     if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
     {
-        cameraPos += cameraSpeed * cameraFront;
+        camera.ProcessKeyboard(FORWARD, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
     {
-        cameraPos -= cameraSpeed * cameraFront;
+        camera.ProcessKeyboard(BACKWARD, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
     {
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        camera.ProcessKeyboard(LEFT, deltaTime);
     }
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
     {
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+        camera.ProcessKeyboard(RIGHT, deltaTime);
     }
 }
 
@@ -388,30 +351,11 @@ void mouse_callback(GLFWwindow* window, double xpos, double ypos)
     lastX = xpos;
     lastY = ypos;
 
-    float sensitivity = 0.05f;
-    xoffset *= sensitivity;
-    yoffset *= sensitivity;
-
-    yaw   += xoffset;
-    pitch += yoffset;
-    pitch = std::min(pitch, 89.0f);
-    pitch = std::max(pitch, -89.0f);
-    
-    glm::vec3 front;
-    front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-    front.y = sin(glm::radians(pitch));
-    front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-    cameraFront = glm::normalize(front);
+    camera.ProcessMouseMovement(xoffset, yoffset);
 }
 
-float fov = 45.0f;
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    if(fov >= 1.0f && fov <= 45.0f)
-        fov -= yoffset;
-    if(fov <= 1.0f)
-        fov = 1.0f;
-    if(fov >= 45.0f)
-        fov = 45.0f;
-    projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
+    camera.ProcessMouseScroll(yoffset);
+    projection = glm::perspective(glm::radians(camera.Zoom), 800.0f / 600.0f, 0.1f, 100.0f);
 }
